@@ -2,6 +2,7 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 from openai import OpenAI
+from search_utils import search_web  # <- import search helper
 
 # Load API key
 load_dotenv()
@@ -21,7 +22,17 @@ description = st.text_area("Detailed Description", height=250)
 
 if st.button("Evaluate Product", key="gpt_eval_button") and description.strip():
     st.markdown("### GPT Evaluation (Beta)")
+    st.markdown("🔍 Searching the web for additional context...")
 
+    # Perform web search
+    try:
+        search_query = f"{product_name} {category_input} {tags} {description[:200]}"
+        search_results = search_web(search_query)
+    except Exception as e:
+        search_results = "No results due to error."
+        st.warning(f"Search failed: {e}")
+
+    # Build GPT prompt
     gpt_prompt = f"""
     Evaluate the product using the following 9 criteria. For each, assign a score from 0 to 5 and provide a short explanation based on the scoring guidance below.
 
@@ -47,6 +58,9 @@ if st.button("Evaluate Product", key="gpt_eval_button") and description.strip():
     - Stage: {stage}
     - Description: {description}
     - Tags: {tags}
+
+    Additional Context (from web search):
+    {search_results}
     """
 
     try:

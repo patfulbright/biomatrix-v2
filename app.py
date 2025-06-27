@@ -40,7 +40,7 @@ def score_category(text, category, preference):
     text = text.lower()
     count = sum(1 for kw in keywords[category] if kw in text)
 
-if st.button("Evaluate Product") and description.strip():
+if st.button("Evaluate Product", key="gpt_eval_button") and description.strip():
     st.markdown("### GPT Evaluation (Beta)")
 
     gpt_prompt = f"""

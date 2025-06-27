@@ -1,11 +1,11 @@
 import streamlit as st
-import openai
 import os
 from dotenv import load_dotenv
+from openai import OpenAI
 
 # Load API key
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 st.set_page_config(page_title="The BioMatrix", layout="wide")
 
@@ -87,7 +87,7 @@ if st.button("Evaluate Product") and description.strip():
     """
 
     try:
-        gpt_response = openai.ChatCompletion.create(
+        gpt_response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a product evaluation assistant for a biotech incubator."},
@@ -96,7 +96,7 @@ if st.button("Evaluate Product") and description.strip():
             temperature=0.2
         )
 
-        gpt_output = gpt_response.choices[0].message.get("content", "").strip()
+        gpt_output = gpt_response.choices[0].message.content.strip()
 
         if gpt_output:
             st.markdown(gpt_output)

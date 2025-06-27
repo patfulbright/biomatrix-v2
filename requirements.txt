@@ -1,5 +1,4 @@
-streamlit
 openai
+streamlit
 python-dotenv
-serpapi
-
+serpapi==0.3.4

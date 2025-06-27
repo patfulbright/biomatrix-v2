@@ -32,6 +32,10 @@ if st.button("Evaluate Product", key="gpt_eval_button") and description.strip():
         search_results = "Search failed or returned no usable results."
         st.warning(f"Web search failed: {e}")
 
+    # Show web search results in expandable section
+    with st.expander("🔍 View Web Search Snippets (Optional)"):
+        st.text_area("Search Results", search_results, height=150)
+
     # Build GPT prompt
     gpt_prompt = f"""
     Evaluate the product using the following 9 criteria. For each, assign a score from 0 to 5 and provide a short explanation based on the scoring guidance below.

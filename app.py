@@ -2,7 +2,7 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 from openai import OpenAI
-from search_utils import search_web  # <- import search helper
+from search_utils import search_web  # Web search integration
 
 # Load API key
 load_dotenv()
@@ -24,13 +24,13 @@ if st.button("Evaluate Product", key="gpt_eval_button") and description.strip():
     st.markdown("### GPT Evaluation (Beta)")
     st.markdown("🔍 Searching the web for additional context...")
 
-    # Perform web search
+    # Perform light web search
     try:
         search_query = f"{product_name} {category_input} {tags} {description[:200]}"
         search_results = search_web(search_query)
     except Exception as e:
-        search_results = "No results due to error."
-        st.warning(f"Search failed: {e}")
+        search_results = "Search failed or returned no usable results."
+        st.warning(f"Web search failed: {e}")
 
     # Build GPT prompt
     gpt_prompt = f"""
@@ -63,6 +63,7 @@ if st.button("Evaluate Product", key="gpt_eval_button") and description.strip():
     {search_results}
     """
 
+    # Run GPT evaluation
     try:
         gpt_response = client.chat.completions.create(
             model="gpt-4",
@@ -81,8 +82,8 @@ if st.button("Evaluate Product", key="gpt_eval_button") and description.strip():
         if gpt_output:
             st.markdown(gpt_output)
         else:
-            st.warning("GPT responded, but no content was returned.")
+            st.warning("GPT responded, but returned no content.")
             st.json(gpt_response)
 
     except Exception as e:
-        st.error(f"Error with GPT API: {e}")
+        st.error(f"Error during GPT evaluation: {e}")

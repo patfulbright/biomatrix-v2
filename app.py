@@ -72,3 +72,37 @@ description = st.text_area("Detailed Description", height=250)
 if st.button("Evaluate Product") and description.strip():
     st.markdown("### GPT Evaluation (Beta)")
 
+    gpt_prompt = f"""
+    Based on the following product information, evaluate it using the internal scoring system for the categories: Strategic Fit, Market Potential, IP Position, and Technical Feasibility.
+    For each category, output:
+    1. A score from 0 to 5
+    2. A short explanation for why that score was given.
+
+    Product Details:
+    - Name: {product_name}
+    - Category: {category_input}
+    - Stage: {stage}
+    - Description: {description}
+    - Tags: {tags}
+    """
+
+    try:
+        gpt_response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a product evaluation assistant for a biotech incubator."},
+                {"role": "user", "content": gpt_prompt}
+            ],
+            temperature=0.2
+        )
+
+        gpt_output = gpt_response.choices[0].message.get("content", "").strip()
+
+        if gpt_output:
+            st.markdown(gpt_output)
+        else:
+            st.warning("GPT responded, but no content was returned.")
+            st.json(gpt_response)
+
+    except Exception as e:
+        st.error(f"Error with GPT API: {e}")

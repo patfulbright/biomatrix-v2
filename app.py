@@ -1,4 +1,11 @@
 import streamlit as st
+import openai
+import os
+from dotenv import load_dotenv
+
+# Load API key
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 st.set_page_config(page_title="The BioMatrix", layout="wide")
 
@@ -42,7 +49,7 @@ def score_category(text, category, preference):
             return 2.0, "Weak alignment with one keyword match."
         else:
             return 0.0, "No alignment found."
-    else:  # for "low" preferred categories like cost/time/regulation
+    else:
         if count >= 3:
             return 0.0, "High complexity or burden based on multiple terms."
         elif count == 2:
@@ -52,37 +59,15 @@ def score_category(text, category, preference):
         else:
             return 5.0, "No negative indicators found – likely low burden."
 
-# --- Updated UI ---
+# --- UI ---
 st.title("The BioMatrix v2.0")
 st.subheader("Product Scoring System")
 
-# New structured input fields
 product_name = st.text_input("Product Name")
 category_input = st.text_input("Category / Use Case (e.g., supplement, diagnostic, wearable)")
 stage = st.selectbox("Stage of Development", ["Concept", "Prototype", "Preclinical", "Launched"])
 tags = st.text_input("Tags / Keywords (optional)")
 description = st.text_area("Detailed Description", height=250)
 
-# Trigger scoring
 if st.button("Evaluate Product") and description.strip():
-    st.markdown("### Scoring Results")
-
-    # Optional: display basic product info above the scores
-    st.markdown(f"**Product Name:** {product_name}")
-    st.markdown(f"**Category:** {category_input}")
-    st.markdown(f"**Stage:** {stage}")
-    if tags:
-        st.markdown(f"**Tags:** {tags}")
-    st.markdown("---")
-
-    total_score = 0
-    max_score = len(categories) * 5
-
-    for cat, pref in categories.items():
-        score, explanation = score_category(description, cat, pref)
-        st.markdown(f"**{cat}**: {score:.1f} / 5")
-        st.caption(f"Reason: {explanation}")
-        total_score += score
-
-    st.markdown("---")
-    st.subheader(f"Total Score: {total_score:.1f} / {max_score} ({(total_score / max_score) * 100:.1f}%)")
+    st.markdown("##

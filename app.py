@@ -70,4 +70,5 @@ tags = st.text_input("Tags / Keywords (optional)")
 description = st.text_area("Detailed Description", height=250)
 
 if st.button("Evaluate Product") and description.strip():
-    st.markdown("##
+    st.markdown("### GPT Evaluation (Beta)")
+

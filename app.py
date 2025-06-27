@@ -52,14 +52,29 @@ def score_category(text, category, preference):
         else:
             return 5.0, "No negative indicators found – likely low burden."
 
-# UI
+# --- Updated UI ---
 st.title("The BioMatrix v2.0")
 st.subheader("Product Scoring System")
 
-description = st.text_area("Paste product description here:", height=250)
+# New structured input fields
+product_name = st.text_input("Product Name")
+category_input = st.text_input("Category / Use Case (e.g., supplement, diagnostic, wearable)")
+stage = st.selectbox("Stage of Development", ["Concept", "Prototype", "Preclinical", "Launched"])
+tags = st.text_input("Tags / Keywords (optional)")
+description = st.text_area("Detailed Description", height=250)
 
-if st.button("Score Product") and description.strip():
+# Trigger scoring
+if st.button("Evaluate Product") and description.strip():
     st.markdown("### Scoring Results")
+
+    # Optional: display basic product info above the scores
+    st.markdown(f"**Product Name:** {product_name}")
+    st.markdown(f"**Category:** {category_input}")
+    st.markdown(f"**Stage:** {stage}")
+    if tags:
+        st.markdown(f"**Tags:** {tags}")
+    st.markdown("---")
+
     total_score = 0
     max_score = len(categories) * 5
 

@@ -22,20 +22,16 @@ description = st.text_area("Detailed Description", height=250)
 
 if st.button("Evaluate Product", key="gpt_eval_button") and description.strip():
     with st.spinner("🧠 Evaluating..."):
-        # Enhanced search query
+        # Improved search query
         search_query = f"{product_name} {category_input} {tags} {description[:200]} biotechnology OR product OR innovation"
 
         try:
             search_results = search_web(search_query)
         except Exception as e:
-            search_results = "Search failed or returned no usable results."
+            search_results = "No additional context found online."
             st.warning(f"Web search failed: {e}")
 
-        # Show web search results in expandable section
-        with st.expander("🔍 View Web Search Snippets (Optional)"):
-            st.text_area("Search Results", search_results, height=150)
-
-        # Build GPT prompt
+        # GPT scoring prompt
         gpt_prompt = f"""
         Evaluate the product using the following 9 criteria. For each, assign a score from 0 to 5 and provide a short explanation based on the scoring guidance below.
 
@@ -80,7 +76,6 @@ if st.button("Evaluate Product", key="gpt_eval_button") and description.strip():
             )
 
             gpt_output = gpt_response.choices[0].message.content.strip()
-
             st.markdown("### ✅ Results")
             if gpt_output:
                 st.markdown(gpt_output)

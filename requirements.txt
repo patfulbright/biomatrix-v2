@@ -1,7 +1,8 @@
 openai
 streamlit
 python-dotenv
-git+https://github.com/serpapi/serpapi-python.git@master
+google-search-results
+
 
 
 

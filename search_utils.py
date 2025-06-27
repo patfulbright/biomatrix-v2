@@ -1,19 +1,31 @@
-from serpapi.google_search_results import GoogleSearch
 import os
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def search_web(query):
+    api_key = os.getenv("SERPAPI_API_KEY")
+    if not api_key:
+        return "SerpAPI key not found."
+
     params = {
         "q": query,
+        "api_key": api_key,
         "engine": "google",
-        "api_key": os.getenv("SERPAPI_KEY")
+        "num": 3,
     }
 
-    search = GoogleSearch(params)
-    results = search.get_dict()
-    snippets = []
+    try:
+        response = requests.get("https://serpapi.com/search", params=params)
+        results = response.json()
+        snippets = []
 
-    for result in results.get("organic_results", [])[:3]:
-        if "snippet" in result:
-            snippets.append(result["snippet"])
+        for result in results.get("organic_results", []):
+            if "snippet" in result:
+                snippets.append(result["snippet"])
 
-    return " ".join(snippets)
+        return "\n\n".join(snippets[:3]) if snippets else "No relevant results found."
+
+    except Exception as e:
+        return f"Search error: {str(e)}"

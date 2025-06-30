@@ -186,5 +186,29 @@ try:
                 st.markdown(row["Explanation"])
                 st.markdown("---")
 
+        # Delete a specific product
+        with st.expander("🗑️ Delete a Product"):
+            delete_id = st.number_input("Enter Product ID to Delete", min_value=1, step=1)
+            if st.button("Delete Product"):
+                db = SessionLocal()
+                product_to_delete = db.query(Product).filter(Product.id == delete_id).first()
+                if product_to_delete:
+                    db.delete(product_to_delete)
+                    db.commit()
+                    st.success(f"✅ Product with ID {delete_id} deleted.")
+                else:
+                    st.error(f"No product found with ID {delete_id}.")
+                db.close()
+
+        # Reset entire leaderboard
+        with st.expander("⚠️ Reset Leaderboard"):
+            confirm_reset = st.checkbox("Yes, I really want to delete ALL products.")
+            if st.button("Reset Leaderboard") and confirm_reset:
+                db = SessionLocal()
+                db.query(Product).delete()
+                db.commit()
+                db.close()
+                st.success("✅ Leaderboard has been reset (all entries deleted).")
+
 except Exception as e:
     st.error(f"Error loading leaderboard: {e}")

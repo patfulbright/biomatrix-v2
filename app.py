@@ -1,46 +1,85 @@
+# BioMatrix 3.0 - Updated app.py with extended features
+
 import streamlit as st
 import os
-import csv
 from dotenv import load_dotenv
 from openai import OpenAI
-from search_utils import search_web  # Web search integration
+from search_utils import search_web
+from sqlalchemy import create_engine, Column, Integer, String, Text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+import pandas as pd
+import re
 
-# Load API key
+# Load environment variables
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+DATABASE_URL = os.getenv("DATABASE_URL").replace("postgresql://", "postgresql+psycopg://")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-st.set_page_config(page_title="The BioMatrix", layout="wide")
+# Set up OpenAI
+client = OpenAI(api_key=OPENAI_API_KEY)
 
-# --- UI ---
-st.title("The BioMatrix v2.0")
-st.subheader("Product Scoring System")
+# SQLAlchemy setup
+Base = declarative_base()
+engine = create_engine(DATABASE_URL, connect_args={"sslmode": "require"})
+SessionLocal = sessionmaker(bind=engine)
 
-product_name = st.text_input("Product Name")
-category_input = st.text_input("Category / Use Case (e.g., supplement, diagnostic, wearable)")
-stage = st.selectbox("Stage of Development", ["Concept", "Prototype", "Preclinical", "Launched"])
-tags = st.text_input("Tags / Keywords (optional)")
-description = st.text_area("Detailed Description", height=250)
+class Product(Base):
+    __tablename__ = "products"
 
-# --- Save to CSV Function ---
-CSV_FILE = "saved_products.csv"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100))
+    category = Column(String(100))
+    stage = Column(String(50))
+    description = Column(Text)
+    tags = Column(String(255))
+    total_score = Column(String(10))
+    explanation = Column(Text)
 
-def save_product_to_csv(product_data):
-    file_exists = os.path.isfile(CSV_FILE)
+Base.metadata.create_all(bind=engine)
 
-    with open(CSV_FILE, mode="a", newline='', encoding='utf-8') as csvfile:
-        fieldnames = ["name", "category", "stage", "description", "tags", "total_score", "explanation"]
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+# UI Config
+st.set_page_config(page_title="BioMatrix 3.0", layout="wide")
+st.markdown("""
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .main {
+            background-color: #ffffff;
+        }
+        h1, h2, h3 {
+            color: #004AAD;
+        }
+        .stButton>button {
+            background-color: #004AAD;
+            color: white;
+            font-weight: bold;
+        }
+        .stTextInput>div>input {
+            background-color: #f9f9f9;
+            color: black;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-        if not file_exists or os.stat(CSV_FILE).st_size == 0:
-            writer.writeheader()
+st.title("BioMatrix 3.0")
+st.subheader("⚙️ Product Scoring System")
 
-        writer.writerow(product_data)
+# Input Form
+with st.form("product_eval_form"):
+    st.markdown("### 🧪 Enter Product Info")
+    product_name = st.text_input("Product Name")
+    category_input = st.text_input("Category / Use Case")
+    stage = st.selectbox("Stage of Development", ["Concept", "Prototype", "Preclinical", "Launched"])
+    tags = st.text_input("Tags / Keywords (optional)")
+    description = st.text_area("Detailed Description", height=250)
+    submitted = st.form_submit_button("Evaluate Product")
 
-# --- Evaluation ---
-if st.button("Evaluate Product", key="gpt_eval_button") and description.strip():
-    with st.spinner("🧠 Evaluating..."):
+if submitted and description.strip():
+    with st.spinner("Analyzing with GPT-4..."):
         search_query = f"{product_name} {category_input} {tags} {description[:200]} biotechnology OR product OR innovation"
-
         try:
             search_results = search_web(search_query)
         except Exception as e:
@@ -48,23 +87,18 @@ if st.button("Evaluate Product", key="gpt_eval_button") and description.strip():
             st.warning(f"Web search failed: {e}")
 
         gpt_prompt = f"""
-        Evaluate the product using the following 9 criteria. For each, assign a score from 0 to 5 and provide a short explanation based on the scoring guidance below.
+        Evaluate the product using the following 9 criteria. For each, assign a score from 0 to 5 and provide a short explanation.
 
-        Scoring Guidance:
-        - Strategic Fit: Alignment with company mission, long-term vision, and core competencies.
-        - Market Potential: Size, CAGR, competitive differentiation, and unmet need.
-        - IP Position: Strength of patents, freedom to operate, licensing barriers.
-        - Technical Feasibility: Maturity of the science, proof-of-concept status, scalability.
-        - Development Cost: Total projected investment required to bring to market.
-        - Time to Market: Time needed for R&D, trials, approval, and launch.
-        - Regulatory Complexity: Likelihood and burden of obtaining regulatory approval.
-        - Synergies: Ability to leverage existing platforms, partnerships, infrastructure, people.
-        - ESG Impact: Environmental, social, and governance value creation.
-
-        Instructions:
-        - Score each category from 0–5.
-        - Provide a 1–2 sentence explanation per category.
-        - At the end, calculate the total score out of 45.
+        Criteria:
+        - Strategic Fit
+        - Market Potential
+        - IP Position
+        - Technical Feasibility
+        - Development Cost
+        - Time to Market
+        - Regulatory Complexity
+        - Synergies
+        - ESG Impact
 
         Product Details:
         - Name: {product_name}
@@ -73,7 +107,7 @@ if st.button("Evaluate Product", key="gpt_eval_button") and description.strip():
         - Description: {description}
         - Tags: {tags}
 
-        Additional Context (from web search):
+        Context from web search:
         {search_results}
         """
 
@@ -81,41 +115,76 @@ if st.button("Evaluate Product", key="gpt_eval_button") and description.strip():
             gpt_response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[
-                    {
-                        "role": "system",
-                        "content": "You are a product evaluation assistant for a biotech incubator. Score products using a 9-part framework with guidance provided."
-                    },
+                    {"role": "system", "content": "You are a biotech scoring assistant."},
                     {"role": "user", "content": gpt_prompt}
                 ],
                 temperature=0.2
             )
 
             gpt_output = gpt_response.choices[0].message.content.strip()
-            st.markdown("### ✅ Results")
+            st.markdown("### ✅ GPT Evaluation Result")
+            st.markdown(gpt_output)
 
-            if gpt_output:
-                st.markdown(gpt_output)
+            match = re.search(r"Total Score\s*[:\-]?\s*(\d+)", gpt_output)
+            total_score = match.group(1) if match else "N/A"
 
-                # Extract total score (assumes it ends in format: "Total Score: XX/45")
-                import re
-                match = re.search(r'Total Score\s*[:\-]?\s*(\d+)', gpt_output)
-                total_score = match.group(1) if match else "N/A"
-
-                if st.button("Save Product"):
-                    save_product_to_csv({
-                        "name": product_name,
-                        "category": category_input,
-                        "stage": stage,
-                        "description": description,
-                        "tags": tags,
-                        "total_score": total_score,
-                        "explanation": gpt_output
-                    })
-                    st.success("✅ Product saved to CSV!")
-
-            else:
-                st.warning("GPT responded, but returned no content.")
-                st.json(gpt_response)
+            if st.button("💾 Save Product"):
+                db = SessionLocal()
+                new_product = Product(
+                    name=product_name,
+                    category=category_input,
+                    stage=stage,
+                    description=description,
+                    tags=tags,
+                    total_score=total_score,
+                    explanation=gpt_output
+                )
+                db.add(new_product)
+                db.commit()
+                db.close()
+                st.success("✅ Product saved to the database!")
 
         except Exception as e:
             st.error(f"Error during GPT evaluation: {e}")
+
+# Leaderboard
+st.markdown("---")
+st.header("📊 Product Leaderboard")
+
+try:
+    db = SessionLocal()
+    products = db.query(Product).all()
+    db.close()
+
+    if not products:
+        st.info("No products found in the database.")
+    else:
+        df = pd.DataFrame([{
+            "ID": p.id,
+            "Name": p.name,
+            "Category": p.category,
+            "Stage": p.stage,
+            "Score": p.total_score,
+            "Tags": p.tags,
+            "Description": p.description,
+            "Explanation": p.explanation
+        } for p in products])
+
+        filter_score = st.slider("Minimum Score to Display", min_value=0, max_value=45, value=0)
+        df = df[df["Score"].apply(pd.to_numeric, errors='coerce') >= filter_score]
+        df = df.sort_values(by="Score", ascending=False, key=pd.to_numeric)
+
+        st.success(f"Loaded {len(df)} product(s) from the database.")
+        st.dataframe(df.drop(columns=["Explanation"]), use_container_width=True)
+
+        if st.download_button("⬇️ Download CSV", data=df.to_csv(index=False), file_name="biomatrix_leaderboard.csv"):
+            st.toast("CSV downloaded")
+
+        if st.checkbox("🔍 Show Full Explanations"):
+            for _, row in df.iterrows():
+                st.markdown(f"**{row['Name']}** - Score: {row['Score']}")
+                st.markdown(row["Explanation"])
+                st.markdown("---")
+
+except Exception as e:
+    st.error(f"Error loading leaderboard: {e}")

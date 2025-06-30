@@ -1,4 +1,4 @@
-# BioMatrix 3.0 - Updated app.py with extended features
+# BioMatrix 3.0 - Final Fixed Version with Centered Title and Functional Save
 
 import streamlit as st
 import os
@@ -61,10 +61,19 @@ st.markdown("""
             background-color: #f9f9f9;
             color: black;
         }
+        .center-title {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 0.5em;
+            color: #004AAD;
+        }
     </style>
 """, unsafe_allow_html=True)
 
-st.title("BioMatrix 3.0")
+st.markdown('<div class="center-title">BioMatrix 3.0</div>', unsafe_allow_html=True)
 st.subheader("⚙️ Product Scoring System")
 
 # Input Form
@@ -78,7 +87,7 @@ with st.form("product_eval_form"):
     submitted = st.form_submit_button("Evaluate Product")
 
 if submitted and description.strip():
-    with st.spinner("Analyzing with GPT-4..."):
+    with st.spinner("Analyzing with AI..."):
         search_query = f"{product_name} {category_input} {tags} {description[:200]} biotechnology OR product OR innovation"
         try:
             search_results = search_web(search_query)

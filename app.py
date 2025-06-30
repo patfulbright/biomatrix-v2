@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+import csv
 from dotenv import load_dotenv
 from openai import OpenAI
 from search_utils import search_web  # Web search integration
@@ -20,9 +21,24 @@ stage = st.selectbox("Stage of Development", ["Concept", "Prototype", "Preclinic
 tags = st.text_input("Tags / Keywords (optional)")
 description = st.text_area("Detailed Description", height=250)
 
+# --- Save to CSV Function ---
+CSV_FILE = "saved_products.csv"
+
+def save_product_to_csv(product_data):
+    file_exists = os.path.isfile(CSV_FILE)
+
+    with open(CSV_FILE, mode="a", newline='', encoding='utf-8') as csvfile:
+        fieldnames = ["name", "category", "stage", "description", "tags", "total_score", "explanation"]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        if not file_exists or os.stat(CSV_FILE).st_size == 0:
+            writer.writeheader()
+
+        writer.writerow(product_data)
+
+# --- Evaluation ---
 if st.button("Evaluate Product", key="gpt_eval_button") and description.strip():
     with st.spinner("🧠 Evaluating..."):
-        # Improved search query
         search_query = f"{product_name} {category_input} {tags} {description[:200]} biotechnology OR product OR innovation"
 
         try:
@@ -31,7 +47,6 @@ if st.button("Evaluate Product", key="gpt_eval_button") and description.strip():
             search_results = "No additional context found online."
             st.warning(f"Web search failed: {e}")
 
-        # GPT scoring prompt
         gpt_prompt = f"""
         Evaluate the product using the following 9 criteria. For each, assign a score from 0 to 5 and provide a short explanation based on the scoring guidance below.
 
@@ -77,8 +92,27 @@ if st.button("Evaluate Product", key="gpt_eval_button") and description.strip():
 
             gpt_output = gpt_response.choices[0].message.content.strip()
             st.markdown("### ✅ Results")
+
             if gpt_output:
                 st.markdown(gpt_output)
+
+                # Extract total score (assumes it ends in format: "Total Score: XX/45")
+                import re
+                match = re.search(r'Total Score\s*[:\-]?\s*(\d+)', gpt_output)
+                total_score = match.group(1) if match else "N/A"
+
+                if st.button("Save Product"):
+                    save_product_to_csv({
+                        "name": product_name,
+                        "category": category_input,
+                        "stage": stage,
+                        "description": description,
+                        "tags": tags,
+                        "total_score": total_score,
+                        "explanation": gpt_output
+                    })
+                    st.success("✅ Product saved to CSV!")
+
             else:
                 st.warning("GPT responded, but returned no content.")
                 st.json(gpt_response)

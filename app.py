@@ -79,7 +79,7 @@ with st.form("product_eval_form"):
     submitted = st.form_submit_button("Evaluate Product")
 
 if submitted and description.strip():
-    with st.spinner("Analyzing with GPT-4..."):
+    with st.spinner("Analyzing with AI..."):
         search_query = f"{product_name} {category_input} {tags} {description[:200]} biotechnology OR product OR innovation"
         try:
             search_results = search_web(search_query)
@@ -129,7 +129,6 @@ if submitted and description.strip():
             match = re.search(r"Total Score\s*[:\-]?\s*(\d+)", gpt_output)
             total_score = match.group(1) if match else "N/A"
 
-            # Store result to session state
             st.session_state["last_result"] = {
                 "name": product_name,
                 "category": category_input,
@@ -143,7 +142,7 @@ if submitted and description.strip():
         except Exception as e:
             st.error(f"Error during GPT evaluation: {e}")
 
-# Save last result manually
+# Save last result and refresh leaderboard
 if "last_result" in st.session_state:
     if st.button("💾 Save Last Evaluation"):
         try:
@@ -154,6 +153,7 @@ if "last_result" in st.session_state:
             db.close()
             st.success("✅ Product saved to the database!")
             del st.session_state["last_result"]
+            st.experimental_rerun()
         except Exception as e:
             st.error(f"Error saving to DB: {e}")
 

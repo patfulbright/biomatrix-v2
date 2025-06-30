@@ -1,4 +1,4 @@
-# BioMatrix 3.0 - Final Version
+# BioMatrix 3.0 - Final Version with Leaderboard Fixes
 
 import streamlit as st
 import os
@@ -42,13 +42,16 @@ Base.metadata.create_all(bind=engine)
 st.set_page_config(page_title="BioMatrix 3.0", layout="wide")
 st.markdown("""
     <style>
-        .main {
+        body {
             background-color: #ffffff;
             color: #000000;
         }
-        h1 {
-            text-align: center;
+        .main {
+            background-color: #ffffff;
+        }
+        h1, h2, h3 {
             color: #004AAD;
+            text-align: center;
         }
         .stButton>button {
             background-color: #004AAD;
@@ -76,7 +79,7 @@ with st.form("product_eval_form"):
     submitted = st.form_submit_button("Evaluate Product")
 
 if submitted and description.strip():
-    with st.spinner("Analyzing with GPT-4..."):
+    with st.spinner("Analyzing with AI..."):
         search_query = f"{product_name} {category_input} {tags} {description[:200]} biotechnology OR product OR innovation"
         try:
             search_results = search_web(search_query)
@@ -123,36 +126,27 @@ if submitted and description.strip():
             st.markdown("### ✅ GPT Evaluation Result")
             st.markdown(gpt_output)
 
-            match = re.search(r"Total Score\s*[:\-]?\s*(\d+)", gpt_output)
-            total_score = match.group(1) if match else "N/A"
+            match = re.search(r"Total Score\s*[:\-]?\s*(\d{1,2})\\b", gpt_output, re.IGNORECASE)
+            total_score = match.group(1) if match else "0"
 
-            # Store in session for later saving
-            st.session_state.last_result = {
-                "name": product_name,
-                "category": category_input,
-                "stage": stage,
-                "description": description,
-                "tags": tags,
-                "total_score": total_score,
-                "explanation": gpt_output,
-            }
+            if st.button("💾 Save Product"):
+                db = SessionLocal()
+                new_product = Product(
+                    name=product_name,
+                    category=category_input,
+                    stage=stage,
+                    description=description,
+                    tags=tags,
+                    total_score=total_score,
+                    explanation=gpt_output
+                )
+                db.add(new_product)
+                db.commit()
+                db.close()
+                st.success("✅ Product saved to the database!")
 
         except Exception as e:
             st.error(f"Error during GPT evaluation: {e}")
-
-# Save functionality
-if st.session_state.get("last_result"):
-    if st.button("💾 Save Last Evaluation"):
-        try:
-            db = SessionLocal()
-            product = Product(**st.session_state.last_result)
-            db.add(product)
-            db.commit()
-            db.close()
-            st.success("✅ Product saved to the database!")
-            del st.session_state["last_result"]
-        except Exception as e:
-            st.error(f"Error saving to DB: {e}")
 
 # Leaderboard
 st.markdown("---")
@@ -177,9 +171,14 @@ try:
             "Explanation": p.explanation
         } for p in products])
 
+        st.write("🛠️ Debug - Raw Scores:", df["Score"].tolist())
+
+        df["Score"] = pd.to_numeric(df["Score"], errors="coerce")
+        df = df.dropna(subset=["Score"])
+
         filter_score = st.slider("Minimum Score to Display", min_value=0, max_value=45, value=0)
-        df = df[df["Score"].apply(pd.to_numeric, errors='coerce') >= filter_score]
-        df = df.sort_values(by="Score", ascending=False, key=pd.to_numeric)
+        df = df[df["Score"] >= filter_score]
+        df = df.sort_values(by="Score", ascending=False)
 
         st.success(f"Loaded {len(df)} product(s) from the database.")
         st.dataframe(df.drop(columns=["Explanation"]), use_container_width=True)
@@ -193,7 +192,6 @@ try:
                 st.markdown(row["Explanation"])
                 st.markdown("---")
 
-        # Delete a specific product
         with st.expander("🗑️ Delete a Product"):
             delete_id = st.number_input("Enter Product ID to Delete", min_value=1, step=1)
             if st.button("Delete Product"):
@@ -207,7 +205,6 @@ try:
                     st.error(f"No product found with ID {delete_id}.")
                 db.close()
 
-        # Reset entire leaderboard
         with st.expander("⚠️ Reset Leaderboard"):
             confirm_reset = st.checkbox("Yes, I really want to delete ALL products.")
             if st.button("Reset Leaderboard") and confirm_reset:

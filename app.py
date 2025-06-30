@@ -1,4 +1,4 @@
-# BioMatrix 3.0 - Final Fixed Version with Save + Leaderboard + Reset/Delete
+# BioMatrix 3.0 - Updated app.py with extended features
 
 import streamlit as st
 import os
@@ -61,17 +61,10 @@ st.markdown("""
             background-color: #f9f9f9;
             color: black;
         }
-        .centered-title {
-            text-align: center;
-            font-size: 36px;
-            color: #004AAD;
-            font-weight: bold;
-            padding-bottom: 10px;
-        }
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="centered-title">BioMatrix 3.0</div>', unsafe_allow_html=True)
+st.title("BioMatrix 3.0")
 st.subheader("⚙️ Product Scoring System")
 
 # Input Form
@@ -85,7 +78,7 @@ with st.form("product_eval_form"):
     submitted = st.form_submit_button("Evaluate Product")
 
 if submitted and description.strip():
-    with st.spinner("Analyzing with GPT-4..."):
+    with st.spinner("Analyzing with AI..."):
         search_query = f"{product_name} {category_input} {tags} {description[:200]} biotechnology OR product OR innovation"
         try:
             search_results = search_web(search_query)
@@ -136,24 +129,20 @@ if submitted and description.strip():
             total_score = match.group(1) if match else "N/A"
 
             if st.button("💾 Save Product"):
-                try:
-                    db = SessionLocal()
-                    new_product = Product(
-                        name=product_name,
-                        category=category_input,
-                        stage=stage,
-                        description=description,
-                        tags=tags,
-                        total_score=total_score,
-                        explanation=gpt_output
-                    )
-                    db.add(new_product)
-                    db.commit()
-                    st.success("✅ Product saved to the database!")
-                except Exception as e:
-                    st.error(f"Error saving product: {e}")
-                finally:
-                    db.close()
+                db = SessionLocal()
+                new_product = Product(
+                    name=product_name,
+                    category=category_input,
+                    stage=stage,
+                    description=description,
+                    tags=tags,
+                    total_score=total_score,
+                    explanation=gpt_output
+                )
+                db.add(new_product)
+                db.commit()
+                db.close()
+                st.success("✅ Product saved to the database!")
 
         except Exception as e:
             st.error(f"Error during GPT evaluation: {e}")
@@ -197,6 +186,7 @@ try:
                 st.markdown(row["Explanation"])
                 st.markdown("---")
 
+        # Delete a specific product
         with st.expander("🗑️ Delete a Product"):
             delete_id = st.number_input("Enter Product ID to Delete", min_value=1, step=1)
             if st.button("Delete Product"):
@@ -210,6 +200,7 @@ try:
                     st.error(f"No product found with ID {delete_id}.")
                 db.close()
 
+        # Reset entire leaderboard
         with st.expander("⚠️ Reset Leaderboard"):
             confirm_reset = st.checkbox("Yes, I really want to delete ALL products.")
             if st.button("Reset Leaderboard") and confirm_reset:

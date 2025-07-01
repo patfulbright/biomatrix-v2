@@ -8,7 +8,6 @@ from search_utils import search_web
 from sqlalchemy import create_engine, Column, Integer, String, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from streamlit.runtime.scriptrunner import rerun
 import pandas as pd
 import re
 
@@ -154,7 +153,7 @@ if "last_result" in st.session_state:
             db.close()
             st.success("✅ Product saved to the database!")
             del st.session_state["last_result"]
-            rerun()
+            st.experimental_rerun()
         except Exception as e:
             st.error(f"Error saving to DB: {e}")
 

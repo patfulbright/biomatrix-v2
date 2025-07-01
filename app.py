@@ -1,4 +1,4 @@
-# BioMatrix 3.0 - Enhanced Scoring with Subcategories & Interactive Explanations
+# BioMatrix 3.0 - Final Version with Refined Prompt
 
 import streamlit as st
 import os
@@ -10,7 +10,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
 import re
-import json
 
 # Load environment variables
 load_dotenv()
@@ -89,37 +88,30 @@ if submitted and description.strip():
             st.warning(f"Web search failed: {e}")
 
         gpt_prompt = f"""
-        Evaluate the product for a bioscience company using the following 9 criteria. For each main category, provide a 0–5 score (including decimals), then provide 5 subcategory scores (also 0–5) that justify the main score. Include a short explanation.
+You are a senior evaluator at a bioscience company. Your role is to determine whether a scientific product or IP should be developed internally, based on its viability, strategic fit, and potential impact.
 
-        Format:
-        Strategic Fit: X.X (Explanation)
-        - Sub1: X.X
-        - Sub2: X.X
-        ...
-        (Repeat for all 9 categories)
-        Total Score: SUM
+Use the 9 core criteria below. For each, assign a score from 0.0 to 5.0 (with decimals allowed), supported by analysis using the 5 detailed sub-criteria per category. Be analytical and development-oriented — you're not evaluating for investment, but for feasibility and strategic value **within your own biotech organization**.
 
-        Criteria:
-        - Strategic Fit
-        - Market Potential
-        - IP Position
-        - Technical Feasibility
-        - Development Cost
-        - Time to Market
-        - Regulatory Complexity
-        - Synergies
-        - ESG Impact
+For each category, provide:
+- A final score (out of 5.0)
+- A short summary
 
-        Product Details:
-        - Name: {product_name}
-        - Category: {category_input}
-        - Stage: {stage}
-        - Description: {description}
-        - Tags: {tags}
+At the end, include:
+- A final cumulative score out of 45
+- A 3–5 sentence summary explaining whether this product should be developed internally and why
 
-        Context from web search:
-        {search_results}
-        """
+Use a clear, professional tone that reflects internal decision-making standards for bioscience product development.
+
+Product Details:
+- Name: {product_name}
+- Category: {category_input}
+- Stage: {stage}
+- Description: {description}
+- Tags: {tags}
+
+Context from web search:
+{search_results}
+"""
 
         try:
             gpt_response = client.chat.completions.create(
@@ -128,15 +120,15 @@ if submitted and description.strip():
                     {"role": "system", "content": "You are a biotech scoring assistant."},
                     {"role": "user", "content": gpt_prompt}
                 ],
-                temperature=0.0
+                temperature=0.2
             )
 
             gpt_output = gpt_response.choices[0].message.content.strip()
-            st.markdown("### ✅ Evaluation Results!")
+            st.markdown("### ✅ GPT Evaluation Result")
             st.markdown(gpt_output)
 
-            total_match = re.search(r"Total Score\s*[:\-]?\s*(\d+(\.\d+)?)", gpt_output)
-            total_score = total_match.group(1) if total_match else "N/A"
+            match = re.search(r"Total Score\s*[:\-]?\s*(\d+(\.\d+)?)", gpt_output)
+            total_score = match.group(1) if match else "N/A"
 
             st.session_state["last_result"] = {
                 "name": product_name,
@@ -151,7 +143,7 @@ if submitted and description.strip():
         except Exception as e:
             st.error(f"Error during GPT evaluation: {e}")
 
-# Save last result
+# Save last result and refresh leaderboard
 if "last_result" in st.session_state:
     if st.button("💾 Save Last Evaluation"):
         try:
@@ -178,7 +170,7 @@ try:
         st.info("No products found in the database.")
     else:
         df = pd.DataFrame([{
-            "#": i+1,
+            "ID": p.id,
             "Name": p.name,
             "Category": p.category,
             "Stage": p.stage,
@@ -186,41 +178,40 @@ try:
             "Tags": p.tags,
             "Description": p.description,
             "Explanation": p.explanation
-        } for i, p in enumerate(products)])
+        } for p in products])
 
         filter_score = st.slider("Minimum Score to Display", min_value=0, max_value=45, value=0)
         df = df[df["Score"].apply(pd.to_numeric, errors='coerce') >= filter_score]
-        df = df.sort_values(by="Score", ascending=False, key=pd.to_numeric)
+        df = df.sort_values(by="Score", ascending=False, key=pd.to_numeric).reset_index(drop=True)
 
         st.success(f"Loaded {len(df)} product(s) from the database.")
-        st.dataframe(df.drop(columns=["Explanation", "Description"]), use_container_width=True)
+        st.dataframe(df.drop(columns=["Explanation"]), use_container_width=True)
+
+        if st.download_button("⬇️ Download CSV", data=df.to_csv(index=False), file_name="biomatrix_leaderboard.csv"):
+            st.toast("CSV downloaded")
 
         if st.checkbox("🔍 Show Full Explanations"):
-            for _, row in df.iterrows():
-                st.markdown(f"**{row['Name']}** - Score: {row['Score']}")
-                main_blocks = re.split(r"\n(?=[A-Z][a-zA-Z\s]+:\s*\d)\n", row["Explanation"])
-                for block in main_blocks:
-                    lines = block.strip().split("\n")
-                    if len(lines) >= 2:
-                        header = lines[0]
-                        with st.expander(header):
-                            for line in lines[1:]:
-                                st.markdown(f"- {line.strip()}")
+            for i, row in df.iterrows():
+                st.markdown(f"**{row['Name']} — Score: {row['Score']}**")
+                with st.expander("Show Criteria Results"):
+                    st.markdown(row["Explanation"])
                 st.markdown("---")
 
+        # Delete a specific product
         with st.expander("🗑️ Delete a Product"):
-            delete_id = st.text_input("Enter Product Name to Delete")
+            delete_id = st.number_input("Enter Product ID to Delete", min_value=1, step=1)
             if st.button("Delete Product"):
                 db = SessionLocal()
-                product_to_delete = db.query(Product).filter(Product.name == delete_id).first()
+                product_to_delete = db.query(Product).filter(Product.id == delete_id).first()
                 if product_to_delete:
                     db.delete(product_to_delete)
                     db.commit()
-                    st.success(f"✅ Product '{delete_id}' deleted.")
+                    st.success(f"✅ Product with ID {delete_id} deleted.")
                 else:
-                    st.error(f"No product found with name '{delete_id}'.")
+                    st.error(f"No product found with ID {delete_id}.")
                 db.close()
 
+        # Reset entire leaderboard
         with st.expander("⚠️ Reset Leaderboard"):
             confirm_reset = st.checkbox("Yes, I really want to delete ALL products.")
             if st.button("Reset Leaderboard") and confirm_reset:

@@ -90,6 +90,8 @@ if submitted and description.strip():
         gpt_prompt = f"""
         Evaluate the following biotechnology product for internal development using these 9 criteria. Your role is to determine whether a scientific product or IP should be developed internally. 
         Each criterion should be scored on a 0–5 decimal scale and include the five sub-category scores and explanations. Evaluate each sub-criterion independently, and do not give all sub criteria the same score unless fully justified.
+Then at the end, 3-5 sentence summary explaining whether this product should be developed internally or not and why:
+        "Total Score: X.X / 45.0"
 
         Use this output format for every product:
         
@@ -100,8 +102,70 @@ if submitted and description.strip():
         - [Subcategory 4] (X.X): Explanation
         - [Subcategory 5] (X.X): Explanation
 
-        Repeat this for all 9 criteria. Then at the end, 3-5 sentence summary explaining whether this product should be developed internally or not and why:
-        "Total Score: X.X / 45.0"
+## Criteria and Sub-Criteria:
+
+**Strategic Fit**
+1. Alignment with Organizational Goals
+2. Market and Customer Alignment
+3. Operational Compatibility
+4. Resource Availability and Capability
+5. Risk and Regulatory Considerations
+
+**Market Potential**
+1. Market Size and Growth Potential
+2. Competitive Landscape
+3. Customer Acceptance and Adoption
+4. Regulatory and Legal Environment
+5. Market Trends and Industry Shifts
+
+**IP Position**
+1. Strength and Enforceability of IP Rights
+2. Freedom-to-Operate (FTO)
+3. Potential for IP Generation and Protection
+4. IP Licensing and Acquisition
+5. IP Landscape and Competitive Environment
+
+**Technical Feasibility**
+1. Uncertainty and Complexity
+2. Limited Data and Information
+3. Evolving Requirements
+4. Resource Constraints
+5. Integration with Existing Systems
+
+**Development Cost**
+1. Scope and Complexity
+2. Technology Choice
+3. Team Expertise and Size
+4. Ongoing Maintenance and Support
+5. External Dependencies and Risks
+
+**Time to Market**
+1. Development Complexity
+2. Resource Availability
+3. Regulatory Requirements & Compliance
+4. Integration with Existing Systems
+5. Vendor Support and Expertise
+
+**Regulatory Complexity**
+1. Uncertainty and Lack of Clarity
+2. Compliance Costs and Burdens
+3. Potential for Changes to Existing Regulations
+4. Liability and Risk
+5. Lack of Standardized Frameworks
+
+**Synergies**
+1. Complementarity of Capabilities
+2. Cross-Functional Benefits
+3. Process Integration Potential
+4. Shared Resource Optimization
+5. Scalability and Future Growth Alignment
+
+**ESG Impact**
+1. Environmental Footprint of the Technology Lifecycle
+2. Labor Practices and Supply Chain Sustainability
+3. Data Privacy and Security
+4. Bias and Fairness
+5. Ethical Governance and Transparency
 
         Product Details:
         - Name: {product_name}

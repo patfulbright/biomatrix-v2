@@ -1,4 +1,4 @@
-# BioMatrix 3.0 - Final Version with Refined Prompt
+# BioMatrix 3.0 - Stable Version with Consistent Output and Fixed Formatting
 
 import streamlit as st
 import os
@@ -88,39 +88,40 @@ if submitted and description.strip():
             st.warning(f"Web search failed: {e}")
 
         gpt_prompt = f"""
-You are a senior evaluator at a bioscience company. Your role is to determine whether a scientific product or IP should be developed internally, based on its viability, strategic fit, and potential impact.
+        Evaluate the following biotechnology product for internal development using these 9 criteria. Your role is to determine whether a scientific product or IP should be developed internally. 
+        Each criterion should be scored on a 0–5 decimal scale and include the five sub-category scores and explanations.
 
-Use the 9 core criteria below. For each, assign a score from 0.0 to 5.0 (with decimals allowed), supported by analysis using the 5 detailed sub-criteria per category. Be analytical and development-oriented — you're not evaluating for investment, but for feasibility and strategic value **within your own biotech organization**.
+        Use this output format for every product:
+        
+        1. [Criterion] (Score: X.X)
+        - [Subcategory 1] (X.X): Explanation
+        - [Subcategory 2] (X.X): Explanation
+        - [Subcategory 3] (X.X): Explanation
+        - [Subcategory 4] (X.X): Explanation
+        - [Subcategory 5] (X.X): Explanation
 
-For each category, provide:
-- A final score (out of 5.0)
-- A short summary
+        Repeat this for all 9 criteria. Then at the end, 3-5 sentence summary explaining whether this product should be developed internally or not and why:
+        "Total Score: X.X / 45.0"
 
-At the end, include:
-- A final cumulative score out of 45
-- A 3–5 sentence summary explaining whether this product should be developed internally and why
+        Product Details:
+        - Name: {product_name}
+        - Category: {category_input}
+        - Stage: {stage}
+        - Description: {description}
+        - Tags: {tags}
 
-Use a clear, professional tone that reflects internal decision-making standards for bioscience product development.
-
-Product Details:
-- Name: {product_name}
-- Category: {category_input}
-- Stage: {stage}
-- Description: {description}
-- Tags: {tags}
-
-Context from web search:
-{search_results}
-"""
+        Context from web search:
+        {search_results}
+        """
 
         try:
             gpt_response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "You are a biotech scoring assistant."},
+                    {"role": "system", "content": "You are an expert bioscience analyst scoring internal products for development."},
                     {"role": "user", "content": gpt_prompt}
                 ],
-                temperature=0.2
+                temperature=0.1
             )
 
             gpt_output = gpt_response.choices[0].message.content.strip()
@@ -170,7 +171,7 @@ try:
         st.info("No products found in the database.")
     else:
         df = pd.DataFrame([{
-            "ID": p.id,
+            "Rank": idx + 1,
             "Name": p.name,
             "Category": p.category,
             "Stage": p.stage,
@@ -178,11 +179,10 @@ try:
             "Tags": p.tags,
             "Description": p.description,
             "Explanation": p.explanation
-        } for p in products])
+        } for idx, p in enumerate(sorted(products, key=lambda x: float(x.total_score if x.total_score != "N/A" else 0), reverse=True))])
 
         filter_score = st.slider("Minimum Score to Display", min_value=0, max_value=45, value=0)
         df = df[df["Score"].apply(pd.to_numeric, errors='coerce') >= filter_score]
-        df = df.sort_values(by="Score", ascending=False, key=pd.to_numeric).reset_index(drop=True)
 
         st.success(f"Loaded {len(df)} product(s) from the database.")
         st.dataframe(df.drop(columns=["Explanation"]), use_container_width=True)
@@ -191,11 +191,11 @@ try:
             st.toast("CSV downloaded")
 
         if st.checkbox("🔍 Show Full Explanations"):
-            for i, row in df.iterrows():
-                st.markdown(f"**{row['Name']} — Score: {row['Score']}**")
-                with st.expander("Show Criteria Results"):
+            for _, row in df.iterrows():
+                with st.expander(f"{row['Name']} - Score: {row['Score']}"):
+                    st.markdown("### Show Criteria Results")
                     st.markdown(row["Explanation"])
-                st.markdown("---")
+                    st.markdown("---")
 
         # Delete a specific product
         with st.expander("🗑️ Delete a Product"):

@@ -1,4 +1,4 @@
-# BioMatrix 3.0 - Final Working Version
+# BioMatrix 3.0 - Updated Scoring & Display
 
 import streamlit as st
 import os
@@ -88,7 +88,10 @@ if submitted and description.strip():
             st.warning(f"Web search failed: {e}")
 
         gpt_prompt = f"""
-        Evaluate the product using the following 9 criteria. For each, assign a score from 0 to 5 and provide a short explanation.
+        You are a scoring assistant evaluating products for a bioscience/biotech innovation company.
+        Emphasize relevance to bioscience when evaluating Strategic Fit and Synergies.
+
+        Evaluate the product using the following 9 criteria. For each, assign a **score from 0.0 to 5.0 (decimals allowed)** and provide a short explanation.
 
         Criteria:
         - Strategic Fit
@@ -100,6 +103,8 @@ if submitted and description.strip():
         - Regulatory Complexity
         - Synergies
         - ESG Impact
+
+        Then calculate and clearly list the **Total Score out of 45** at the end.
 
         Product Details:
         - Name: {product_name}
@@ -123,20 +128,11 @@ if submitted and description.strip():
             )
 
             gpt_output = gpt_response.choices[0].message.content.strip()
-
-            # Extract numeric scores and compute total
-            score_lines = re.findall(r":\s*([0-5](?:\.\d)?)", gpt_output)
-            if score_lines:
-                numeric_scores = [float(score) for score in score_lines[:9]]
-                total = sum(numeric_scores)
-                total_score = str(round(total))
-                gpt_output += f"\n\n**Total Score: {round(total)}/45**"
-            else:
-                total_score = "0"
-                gpt_output += "\n\n**Total Score: 0/45 (could not extract scores)**"
-
             st.markdown("### ✅ GPT Evaluation Result")
             st.markdown(gpt_output)
+
+            match = re.search(r"Total Score\s*[:\-]?\s*(\d+\.?\d*)", gpt_output)
+            total_score = match.group(1) if match else "N/A"
 
             st.session_state["last_result"] = {
                 "name": product_name,
@@ -151,7 +147,7 @@ if submitted and description.strip():
         except Exception as e:
             st.error(f"Error during GPT evaluation: {e}")
 
-# Save last result and refresh leaderboard
+# Save last result
 if "last_result" in st.session_state:
     if st.button("💾 Save Last Evaluation"):
         try:
@@ -178,7 +174,6 @@ try:
         st.info("No products found in the database.")
     else:
         df = pd.DataFrame([{
-            "ID": p.id,
             "Name": p.name,
             "Category": p.category,
             "Stage": p.stage,
@@ -188,7 +183,7 @@ try:
             "Explanation": p.explanation
         } for p in products])
 
-        filter_score = st.slider("Minimum Score to Display", min_value=0, max_value=45, value=0)
+        filter_score = st.slider("Minimum Score to Display", min_value=0.0, max_value=45.0, value=0.0, step=0.1)
         df = df[df["Score"].apply(pd.to_numeric, errors='coerce') >= filter_score]
         df = df.sort_values(by="Score", ascending=False, key=pd.to_numeric)
 
@@ -205,16 +200,16 @@ try:
                 st.markdown("---")
 
         with st.expander("🗑️ Delete a Product"):
-            delete_id = st.number_input("Enter Product ID to Delete", min_value=1, step=1)
+            delete_name = st.text_input("Enter Product Name to Delete")
             if st.button("Delete Product"):
                 db = SessionLocal()
-                product_to_delete = db.query(Product).filter(Product.id == delete_id).first()
+                product_to_delete = db.query(Product).filter(Product.name == delete_name).first()
                 if product_to_delete:
                     db.delete(product_to_delete)
                     db.commit()
-                    st.success(f"✅ Product with ID {delete_id} deleted.")
+                    st.success(f"✅ Product '{delete_name}' deleted.")
                 else:
-                    st.error(f"No product found with ID {delete_id}.")
+                    st.error(f"No product found with name '{delete_name}'.")
                 db.close()
 
         with st.expander("⚠️ Reset Leaderboard"):

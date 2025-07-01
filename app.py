@@ -1,4 +1,4 @@
-# BioMatrix 3.0 - Final Fixed Version
+# BioMatrix 3.0 - Final Working Version
 
 import streamlit as st
 import os
@@ -123,11 +123,20 @@ if submitted and description.strip():
             )
 
             gpt_output = gpt_response.choices[0].message.content.strip()
+
+            # Extract numeric scores and compute total
+            score_lines = re.findall(r":\s*([0-5](?:\.\d)?)", gpt_output)
+            if score_lines:
+                numeric_scores = [float(score) for score in score_lines[:9]]
+                total = sum(numeric_scores)
+                total_score = str(round(total))
+                gpt_output += f"\n\n**Total Score: {round(total)}/45**"
+            else:
+                total_score = "0"
+                gpt_output += "\n\n**Total Score: 0/45 (could not extract scores)**"
+
             st.markdown("### ✅ GPT Evaluation Result")
             st.markdown(gpt_output)
-
-            match = re.search(r"Total Score\s*[:\-]?\s*(\d+)", gpt_output)
-            total_score = match.group(1) if match else "N/A"
 
             st.session_state["last_result"] = {
                 "name": product_name,
@@ -195,7 +204,6 @@ try:
                 st.markdown(row["Explanation"])
                 st.markdown("---")
 
-        # Delete a specific product
         with st.expander("🗑️ Delete a Product"):
             delete_id = st.number_input("Enter Product ID to Delete", min_value=1, step=1)
             if st.button("Delete Product"):
@@ -209,7 +217,6 @@ try:
                     st.error(f"No product found with ID {delete_id}.")
                 db.close()
 
-        # Reset entire leaderboard
         with st.expander("⚠️ Reset Leaderboard"):
             confirm_reset = st.checkbox("Yes, I really want to delete ALL products.")
             if st.button("Reset Leaderboard") and confirm_reset:

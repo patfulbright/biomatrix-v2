@@ -89,7 +89,7 @@ if submitted and description.strip():
 
         gpt_prompt = f"""
         Evaluate the following biotechnology product for internal development using these 9 criteria. Your role is to determine whether a scientific product or IP should be developed internally. 
-        Each criterion should be scored on a 0–5 decimal scale and include the five sub-category scores and explanations.
+        Each criterion should be scored on a 0–5 decimal scale and include the five sub-category scores and explanations. Evaluate each sub-criterion independently, and do not give all sub criteria the same score unless fully justified.
 
         Use this output format for every product:
         
@@ -121,7 +121,7 @@ if submitted and description.strip():
                     {"role": "system", "content": "You are an expert bioscience analyst scoring internal products for development."},
                     {"role": "user", "content": gpt_prompt}
                 ],
-                temperature=0.1
+                temperature=0.0
             )
 
             gpt_output = gpt_response.choices[0].message.content.strip()
@@ -193,7 +193,7 @@ try:
         if st.checkbox("🔍 Show Full Explanations"):
             for _, row in df.iterrows():
                 with st.expander(f"{row['Name']} - Score: {row['Score']}"):
-                    st.markdown("### Show Criteria Results")
+                    st.markdown("### Criteria Results")
                     st.markdown(row["Explanation"])
                     st.markdown("---")
 

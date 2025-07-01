@@ -153,7 +153,6 @@ if "last_result" in st.session_state:
             db.close()
             st.success("✅ Product saved to the database!")
             del st.session_state["last_result"]
-            st.experimental_rerun()
         except Exception as e:
             st.error(f"Error saving to DB: {e}")
 

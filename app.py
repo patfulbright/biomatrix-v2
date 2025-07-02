@@ -97,8 +97,8 @@ Scoring should be rigorous and based on evidence, domain knowledge, and light re
 You must internally consider the five sub-criteria within each category to help contribute to the overall evaluation.
 
 Important rules:
-- Return exactly **one score per category**, from 1.0 (poor) to 5.0 (excellent).
-- Do **not** show any subcategory breakdowns.
+- Return exactly **one score per category** from 1.0 (poor) to 5.0 (excellent).
+- Show subcategory scores for viewing perposes only
 - If data is unclear, reflect that with a more cautious score (e.g. 3.0 or lower).
 - Avoid scoring all categories the same. Make meaningful distinctions based off justified reasons.
 - Do not recommend whether the product should be developed.

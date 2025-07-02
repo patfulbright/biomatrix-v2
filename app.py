@@ -90,10 +90,15 @@ if submitted and description.strip():
         gpt_prompt = f"""
        You are a research analyst for a biotechnology company.
 
-Your role is to evaluate a new product or technology across nine categories using rigorous and objective scoring. Each category should be scored from 1.0-5.0, based on how well the product meets the criteria.
+Your role is to evaluate a new product or technology across nine categories using rigorous and objective scoring.
         Evaluate each subcategory independently.
 Then at the end, 1-3 sentence summary explaining whether this product should be developed internally or not and why:
+
 Scoring should be rigorous and evidence-based. Think critically about each aspect of the evaluation and assume the company will use this as input for internal decisions.
+
+Important: Each of the 9 criterion must be scored as a whole, on a single scale from 1 to 5.
+Consider all 5 sub-criteria internally, but produce only one score per category.
+Do not average or sum subcategory. Use your reasoning to determine a composite score from 1 (very poor alignment) to 5 (excellent alignment).
         "Total Score: X.X / 45.0"
 
         Use this output format for every product:

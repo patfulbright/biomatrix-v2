@@ -88,9 +88,12 @@ if submitted and description.strip():
             st.warning(f"Web search failed: {e}")
 
         gpt_prompt = f"""
-        Evaluate the following product for internal development within a biotechnology company adhearing to these 9 criteria.
-        Each criterion should be scored on a 1–5 decimal scale and include the five sub-category scores and explanations it was scored that way. Evaluate each sub-criterion independently, and do not give all sub criteria the same score unless fully justified.
+       You are a research analyst for a biotechnology company.
+
+Your role is to evaluate a new product or technology across nine categories using rigorous and objective scoring. Each category should be scored from 1 to 5, based on how well the product meets the criteria.
+        Evaluate each subcategory independently.
 Then at the end, 1-3 sentence summary explaining whether this product should be developed internally or not and why:
+Scoring should be rigorous and evidence-based. Think critically about each aspect of the evaluation and assume the company will use this as input for internal decisions.
         "Total Score: X.X / 45.0"
 
         Use this output format for every product:
@@ -102,70 +105,70 @@ Then at the end, 1-3 sentence summary explaining whether this product should be 
         - [Subcategory 4] (X.X): Explanation
         - [Subcategory 5] (X.X): Explanation
 
-## Criteria and Sub-Criteria:
+You must evaluate the following categories. Each criterion contains five subcategory that include explanatory guidance. Use these explanations to inform your scoring.
 
-**Strategic Fit**
-1. Alignment with Organizational Goals
-2. Market and Customer Alignment
-3. Operational Compatibility
-4. Resource Availability and Capability
-5. Risk and Regulatory Considerations
+**Strategic Fit considerations:**
+1. Alignment with Organizational Goals – Does the technology support the company’s long-term mission, vision, and strategic objectives; will it enhance core competencies or contribute to competitive advantage?
+2. Market and Customer Alignment – Does the technology address current and future market needs; will it help meet customer demands, improve satisfaction, or open new market segments?
+3. Operational Compatibility – Can the technology integrate effectively with existing processes, systems, and infrastructure, requiring minimal workflow or infrastructure changes?
+4. Resource Availability and Capability – Does the organization have or can it acquire the necessary skills, talent, and financial resources to implement and sustain the technology?
+5. Risk and Regulatory Considerations – Are there minimal risks related to adoption, security, compliance, or IP? Does it align with industry standards and legal frameworks?
 
-**Market Potential**
-1. Market Size and Growth Potential
-2. Competitive Landscape
-3. Customer Acceptance and Adoption
-4. Regulatory and Legal Environment
-5. Market Trends and Industry Shifts
+**Market Potential considerations:**
+1. Market Size and Growth Potential – Does the overall size of the target market and its projected growth rate justify this product as a key opportunity?
+2. Competitive Landscape – How significant is competition? Are market share, competitor strengths/weaknesses favorable for adoption?
+3. Customer Acceptance and Adoption – Are target customers likely to adopt the technology easily or is adoption slow and difficult?
+4. Regulatory and Legal Environment – Are there major regulations or legal risks that could limit market entry?
+5. Market Trends and Industry Shifts – Are there emerging macro trends that make this product more viable in the near future?
 
-**IP Position**
-1. Strength and Enforceability of IP Rights
-2. Freedom-to-Operate (FTO)
-3. Potential for IP Generation and Protection
-4. IP Licensing and Acquisition
-5. IP Landscape and Competitive Environment
+**IP Position considerations:**
+1. Strength and Enforceability of IP Rights – Is there strong existing IP (e.g. patents, trade secrets)?
+2. Freedom-to-Operate (FTO) – Are there likely IP conflicts or does the product have a clear FTO path?
+3. Potential for IP Generation and Protection – Can further innovation during development generate additional protectable IP?
+4. IP Licensing and Acquisition – Are barriers to acquiring or licensing necessary IP minimal?
+5. IP Landscape and Competitive Environment – What is the strength of competitors’ IP in this space?
 
-**Technical Feasibility**
-1. Uncertainty and Complexity
-2. Limited Data and Information
-3. Evolving Requirements
-4. Resource Constraints
-5. Integration with Existing Systems
+**Technical Feasibility considerations:**
+1. Uncertainty and Complexity – Are technical systems well understood and predictable or highly uncertain?
+2. Limited Data and Information – Is there sufficient data to evaluate feasibility, or are assumptions speculative?
+3. Evolving Requirements – Will regulatory expectations or stakeholder inputs affect technical development positively?
+4. Resource Constraints – Do we have the necessary engineering and infrastructure, or will we need major partnerships?
+5. Integration with Existing Systems – Can the technology smoothly plug into existing infrastructure and workflows?
 
-**Development Cost**
-1. Scope and Complexity
-2. Technology Choice
-3. Team Expertise and Size
-4. Ongoing Maintenance and Support
-5. External Dependencies and Risks
+**Development Cost considerations:**
+1. Scope and Complexity – Does the scope require significant dev time or resources?
+2. Technology Choice – Does the technology require high specialization or is it relatively standard?
+3. Team Expertise and Size – Can a reasonably sized team deliver this, or will it require scaling up substantially?
+4. Ongoing Maintenance and Support – Are there high recurring costs or special support burdens post-launch?
+5. External Dependencies and Risks – Do costs depend on third parties, vendors, or licenses that introduce volatility?
 
-**Time to Market**
-1. Development Complexity
-2. Resource Availability
-3. Regulatory Requirements & Compliance
-4. Integration with Existing Systems
-5. Vendor Support and Expertise
+**Time to Market considerations:**
+1. Development Complexity – How complex is the engineering and implementation timeline?
+2. Resource Availability – Are the people, funds, and tools readily accessible?
+3. Regulatory Requirements & Compliance – Will approval cycles be fast or burdensome?
+4. Integration with Existing Systems – How quickly can it be implemented into current infrastructure?
+5. Vendor Support and Expertise – Is external help readily available to accelerate development?
 
-**Regulatory Complexity**
-1. Uncertainty and Lack of Clarity
-2. Compliance Costs and Burdens
-3. Potential for Changes to Existing Regulations
-4. Liability and Risk
-5. Lack of Standardized Frameworks
+**Regulatory Complexity considerations:**
+1. Uncertainty and Lack of Clarity – Is this an emerging, poorly regulated area?
+2. Compliance Costs and Burdens – Are costs for audits, legal reviews, and testing high?
+3. Potential for Changes to Existing Regulations – Would implementation require rewriting SOPs and compliance manuals?
+4. Liability and Risk – Does this introduce legal risk due to poor precedent or novel science?
+5. Lack of Standardized Frameworks – Is the regulatory landscape fragmented across jurisdictions?
 
-**Synergies**
-1. Complementarity of Capabilities
-2. Cross-Functional Benefits
-3. Process Integration Potential
-4. Shared Resource Optimization
-5. Scalability and Future Growth Alignment
+**Synergy considerations:**
+1. Complementarity of Capabilities – Does this add leverage to our current systems/products?
+2. Cross-Functional Benefits – Will multiple teams gain value from this tech?
+3. Process Integration Potential – Will this fit easily into our ops?
+4. Shared Resource Optimization – Does this improve utilization of people, infrastructure, or data?
+5. Scalability and Future Growth Alignment – Can it scale with us and amplify future tech?
 
-**ESG Impact**
-1. Environmental Footprint of the Technology Lifecycle
-2. Labor Practices and Supply Chain Sustainability
-3. Data Privacy and Security
-4. Bias and Fairness
-5. Ethical Governance and Transparency
+**ESG considerations:**
+1. Environmental Footprint of the Technology Lifecycle – Is this tech environmentally sustainable across its life cycle?
+2. Labor Practices and Supply Chain Sustainability – Are materials and labor sourced ethically and responsibly?
+3. Data Privacy and Security – Will this protect user data and adhere to high security standards?
+4. Bias and Fairness – Will development avoid harmful bias and promote equity?
+5. Ethical Governance and Transparency – Is there transparency and accountability in the design and use of this product?
 
         Product Details:
         - Name: {product_name}
@@ -189,7 +192,7 @@ Then at the end, 1-3 sentence summary explaining whether this product should be 
             )
 
             gpt_output = gpt_response.choices[0].message.content.strip()
-            st.markdown("### ✅ GPT Evaluation Result")
+            st.markdown("### ✅ Evaluation Results!")
             st.markdown(gpt_output)
 
             match = re.search(r"Total Score\s*[:\-]?\s*(\d+(\.\d+)?)", gpt_output)

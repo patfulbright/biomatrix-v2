@@ -88,24 +88,23 @@ if submitted and description.strip():
             st.warning(f"Web search failed: {e}")
 
         gpt_prompt = f"""
-	You are a research analyst for a biotechnology company.
+You are a research analyst for a biotechnology company.
 
-Your role is to evaluate a new product or technology across nine categories using rigorous and objective scoring. Each category must receive a single score from 1.0 to 5.0.
+Your job is to evaluate a new product or technology across nine categories. For each category, you must provide **one score only**, from 1.0 to 5.0.
 
-**Do not recommend whether the product should be developed. Do not summarize or provide analysis.**
+Scoring should be rigorous and based on evidence, domain knowledge, and light research when necessary.
 
-Scoring should be evidence-based and reflect uncertainty when needed.
+You must internally consider the five sub-criteria within each category to help contribute to the overall evaluation.
 
-Important scoring rules:
-- You must return **exactly one score per category**, from 1.0 to 5.0.
-- Internally consider all five sub-criteria per category.
-- Avoid scoring all categories the same. Distinguish between areas of strength and weakness.
-- If the product has insufficient data in a category, assign a lower score.
-
-Do not average or sum sub-criteria. Use your reasoning to determine a composite score from 1 (very poor alignment) to 5 (excellent alignment).
+Important rules:
+- Return exactly **one score per category**, from 1.0 (poor) to 5.0 (excellent).
+- Do **not** show any subcategory breakdowns.
+- If data is unclear, reflect that with a more cautious score (e.g. 3.0 or lower).
+- Avoid scoring all categories the same. Make meaningful distinctions based off justified reasons.
+- Do not recommend whether the product should be developed.
         "Total Score: X.X / 45.0"
 
-        Use this output format for every product:
+        Use this exact output format for every product:
         
         1. [Criterion] (Score: X.X)
         - [Subcategory 1] (X.X): Explanation

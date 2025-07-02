@@ -98,8 +98,8 @@ You must internally consider the five sub-criteria within each category to help 
 
 Important rules:
 - Return exactly **one score per category** from 1.0 (poor) to 5.0 (excellent).
-- Show subcategory scores for viewing perposes only
-- Each subcategory should vary depending on the products fit to the category. 
+- Show subcategory scores for viewing perposes only (1.0-5.0)
+- Each subcategory should vary in score depending on the products fit to the category. 
 - If data is unclear, reflect that with a more cautious score (e.g. 3.0 or lower).
 - Avoid scoring all categories the same. Make meaningful distinctions based off justified reasons.
 - Do not recommend whether the product should be developed.

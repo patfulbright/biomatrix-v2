@@ -88,9 +88,9 @@ if submitted and description.strip():
             st.warning(f"Web search failed: {e}")
 
         gpt_prompt = f"""
-        Evaluate the following biotechnology product for internal development using these 9 criteria. Your role is to determine whether a scientific product or IP should be developed internally. 
-        Each criterion should be scored on a 0–5 decimal scale and include the five sub-category scores and explanations. Evaluate each sub-criterion independently, and do not give all sub criteria the same score unless fully justified.
-Then at the end, 3-5 sentence summary explaining whether this product should be developed internally or not and why:
+        Evaluate the following product for internal development within a biotechnology company adhearing to these 9 criteria.
+        Each criterion should be scored on a 1–5 decimal scale and include the five sub-category scores and explanations it was scored that way. Evaluate each sub-criterion independently, and do not give all sub criteria the same score unless fully justified.
+Then at the end, 1-3 sentence summary explaining whether this product should be developed internally or not and why:
         "Total Score: X.X / 45.0"
 
         Use this output format for every product:

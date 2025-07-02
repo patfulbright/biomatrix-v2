@@ -107,11 +107,11 @@ Important rules:
         Use this exact output format for every product:
         
         1. [Criterion] (Score: X.X)
-        - [Subcategory 1] (X.X): Explanation
-        - [Subcategory 2] (X.X): Explanation
-        - [Subcategory 3] (X.X): Explanation
-        - [Subcategory 4] (X.X): Explanation
-        - [Subcategory 5] (X.X): Explanation
+        - [Subcategory 1] (Score: X.X): Explanation
+        - [Subcategory 2] (Score: X.X): Explanation
+        - [Subcategory 3] (Score: X.X): Explanation
+        - [Subcategory 4] (Score: X.X): Explanation
+        - [Subcategory 5] (Score: X.X): Explanation
 
 You must evaluate the following categories. Each criterion contains five subcategory that include explanatory guidance. Use these explanations to inform your scoring.
 

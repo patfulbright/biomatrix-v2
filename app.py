@@ -99,6 +99,7 @@ You must internally consider the five sub-criteria within each category to help 
 Important rules:
 - Return exactly **one score per category** from 1.0 (poor) to 5.0 (excellent).
 - Show subcategory scores for viewing perposes only
+- Each subcategory should vary depending on the products fit to the category. 
 - If data is unclear, reflect that with a more cautious score (e.g. 3.0 or lower).
 - Avoid scoring all categories the same. Make meaningful distinctions based off justified reasons.
 - Do not recommend whether the product should be developed.
@@ -113,7 +114,7 @@ Important rules:
         - [Subcategory 4] (Score: X.X): Explanation
         - [Subcategory 5] (Score: X.X): Explanation
 
-You must evaluate the following categories. Each criterion contains five subcategory that include explanatory guidance. Use these explanations to inform your scoring.
+You must evaluate the following categories. Each criterion contains five subcategory that include explanatory guidance. Use these parameters to justify your scoring.
 
 **Strategic Fit considerations:**
 1. Alignment with Organizational Goals – Does the technology support the company’s long-term mission, vision, and strategic objectives; will it enhance core competencies or contribute to competitive advantage?

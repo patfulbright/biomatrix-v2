@@ -90,7 +90,7 @@ if submitted and description.strip():
         gpt_prompt = f"""
        You are a research analyst for a biotechnology company.
 
-Your role is to evaluate a new product or technology across nine categories using rigorous and objective scoring. Each category should be scored from 1 to 5, based on how well the product meets the criteria.
+Your role is to evaluate a new product or technology across nine categories using rigorous and objective scoring. Each category should be scored from 1.0-5.0, based on how well the product meets the criteria.
         Evaluate each subcategory independently.
 Then at the end, 1-3 sentence summary explaining whether this product should be developed internally or not and why:
 Scoring should be rigorous and evidence-based. Think critically about each aspect of the evaluation and assume the company will use this as input for internal decisions.

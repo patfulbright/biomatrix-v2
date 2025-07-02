@@ -94,10 +94,13 @@ Your role is to evaluate a new product or technology across nine categories usin
         Evaluate each subcategory independently.
 Then at the end, 1-3 sentence summary explaining whether this product should be developed internally or not and why:
 
-Scoring should be rigorous and evidence-based. Think critically about each aspect of the evaluation and assume the company will use this as input for internal decisions.
+Scoring should be rigorous and evidence-based. Think critically about each aspect of the evaluation.
 
-Important: Each of the 9 criterion must be scored as a whole, on a single scale from 1 to 5.
-Consider all 5 sub-criteria internally, but produce only one score per category.
+Important: Each of the 9 criterion must be scored as a whole, on a single scale from 1.0 to 5.0.
+Consider all 5 subcategory internally, but produce only one score per criteria.
+
+If information is unclear or limited, reflect that in the score (e.g., a 3.0 or lower may be more appropriate).
+
 Do not average or sum subcategory. Use your reasoning to determine a composite score from 1 (very poor alignment) to 5 (excellent alignment).
         "Total Score: X.X / 45.0"
 

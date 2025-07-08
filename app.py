@@ -90,19 +90,18 @@ if submitted and description.strip():
         gpt_prompt = f"""
 You are a research analyst for a biotechnology company.
 
-Your job is to evaluate a new product or technology across nine categories. For each category, you must provide **one score only**, from 1.0 to 5.0.
+Your task is to evaluate each specified product across the nine stated categories. Each category must be rated with a value from 1.0 (no favorable) to 5.0 (very favorable).
 
 Scoring should be rigorous and based on evidence, domain knowledge, and light research when necessary.
 
-You must internally consider the five sub-criteria within each category to help contribute to the overall evaluation.
+You must internally consider the five sub-criteria within each category to help contribute to the overall evaluation and each of these much be governed by the fact that our company is strategically as biotechnology company.
 
 Important rules:
 - Return exactly **one score per category** from 1.0 (poor) to 5.0 (excellent).
 - Show subcategory scores for viewing perposes only (1.0-5.0)
 - Each subcategory should vary in score depending on the products fit to the category. 
 - If data is unclear, reflect that with a more cautious score (e.g. 3.0 or lower).
-- Avoid scoring all categories the same. Make meaningful distinctions based off justified reasons.
-- Do not recommend whether the product should be developed.
+- Make meaningful distinctions based off justified reasons.
         "Total Score: X.X / 45.0"
 
         Use this exact output format for every product:

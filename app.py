@@ -90,11 +90,23 @@ if submitted and description.strip():
         gpt_prompt = f"""
 You work for Strike BioTech, a biotechnology company focused on developing and commercializing products that involve biologically-driven innovation.
 
-You are evaluating whether a potential product is strategically aligned with Strike BioTech’s mission, capabilities, and goals based on the 9 criteria. This includes assessing how biologically relevant the product is and how well it fits our R&D, regulatory, and commercialization infrastructure.
+Our core areas include:
+
+- Engineered microbes (environmental, industrial, or therapeutic)
+- Synthetic biology platforms
+- Bioactive natural compounds
+- Molecular delivery systems
+- Environmental bioremediation using biological agents
+- Biotech diagnostics and sensors
+- Biologically integrated materials
+- Life sciences technologies rooted in biology
+
+Any product being evaluated should be scored based on how well it fits this vision. You are not being asked to decide whether to build the product — only to objectively score how well it aligns with Strike’s strategic, technical, and commercial framework as a **bioscience-first company**.
+
 
 Your task is to evaluate each specified product across the nine stated categories. Each category must be rated with a value from 1.0 (no favorable) to 5.0 (very favorable).
 
-Scoring should be rigorous and based on evidence, domain knowledge, and light research when necessary.
+Scoring should be rigorous and based on evidence, domain knowledge, and research when necessary.
 
 You must internally consider the five sub-criteria within each category to help contribute to the overall evaluation and each of these much be governed by the fact that our company is strategically as biotechnology company.
 
@@ -103,23 +115,21 @@ Important rules:
 - Show subcategory scores for viewing perposes only (1.0-5.0)
 - Each subcategory should vary in score depending on the products fit to the category. 
 - If data is unclear, reflect that with a more cautious score (e.g. 3.0 or lower).
-- Make meaningful distinctions backed by justified reasons.
   
-**Output format:**
+**Use this exact output format:**
 
-1. Strategic Fit (Score: X.X) Explanation   
-2. Market Potential (Score: X.X) Explanation
-3. IP Position (Score: X.X) Explanation 
-4. Technical Feasibility (Score: X.X) Explanation
-5. Development Cost (Score: X.X) Explanation
-6. Time to Market (Score: X.X) Explanation
-7. Regulatory Complexity (Score: X.X) Explanation
-8. Synergy (Score: X.X) Explanation
-9. ESG (Score: X.X) Explanation
+1. [Category Name] (Score: X.X)
+- [Sub-criterion 1] (Score: X.X): Explanation
+- [Sub-criterion 2] (Score: X.X): Explanation
+- [Sub-criterion 3] (Score: X.X): Explanation
+- [Sub-criterion 4] (Score: X.X): Explanation
+- [Sub-criterion 5] (Score: X.X): Explanation
+
+(Repeat for all 9 categories)
 
 Total Score: X.X / 45.0
 
-You must evaluate the following categories. Each criterion contains five subcategory that include explanatory guidance. Use these parameters to justify your scoring.
+Give **varied sub-scores**. Do not give the same number for every sub-point unless justified. Use evidence, research, and reasoning to assess each sub-criterion individually.
 
 **Strategic Fit considerations:**
 1. Alignment with Organizational Goals – Does the technology support the company’s long-term mission, vision, and strategic objectives; will it enhance core competencies or contribute to competitive advantage?
@@ -199,7 +209,7 @@ You must evaluate the following categories. Each criterion contains five subcate
             gpt_response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "You are an expert bioscience analyst scoring internal products for development."},
+                    {"role": "system", "content": "You are an expert bioscience analyst scoring internal products for potential development. You must determin whether the product relates directly with bioscience and the other criteria."},
                     {"role": "user", "content": gpt_prompt}
                 ],
                 temperature=0.0

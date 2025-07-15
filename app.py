@@ -88,12 +88,9 @@ if submitted and description.strip():
             st.warning(f"Web search failed: {e}")
 
         gpt_prompt = f"""
-You work for Strike BioTech, a biotechnology company focused on developing and commercializing products that involve biologically-driven innovation, including engineered microbes, molecular delivery systems, and natural compound therapeutics.
+You work for Strike BioTech, a biotechnology company focused on developing and commercializing products that involve biologically-driven innovation.
 
-You are evaluating whether a potential product is strategically aligned with Strike BioTech’s mission, capabilities, and goals. This includes assessing how biologically relevant the product is, whether it falls within or adjacent to core biotech domains, and how well it fits our R&D, regulatory, and commercialization infrastructure.
-
-You are not deciding whether to build the product — you are scoring its strategic and technical fit based on our biotech company’s perspective.
-You are a research analyst for a biotechnology company.
+You are evaluating whether a potential product is strategically aligned with Strike BioTech’s mission, capabilities, and goals based on the 9 criteria. This includes assessing how biologically relevant the product is and how well it fits our R&D, regulatory, and commercialization infrastructure.
 
 Your task is to evaluate each specified product across the nine stated categories. Each category must be rated with a value from 1.0 (no favorable) to 5.0 (very favorable).
 

@@ -104,16 +104,20 @@ Important rules:
 - Each subcategory should vary in score depending on the products fit to the category. 
 - If data is unclear, reflect that with a more cautious score (e.g. 3.0 or lower).
 - Make meaningful distinctions backed by justified reasons.
-        "Total Score: X.X / 45.0"
+  
+**Output format:**
 
-        Use this exact output format for every product:
-        
-        1. [Criterion] (Score: X.X)
-        - [Subcategory 1] (Score: X.X): Explanation
-        - [Subcategory 2] (Score: X.X): Explanation
-        - [Subcategory 3] (Score: X.X): Explanation
-        - [Subcategory 4] (Score: X.X): Explanation
-        - [Subcategory 5] (Score: X.X): Explanation
+1. Strategic Fit (Score: X.X) Explanation   
+2. Market Potential (Score: X.X) Explanation
+3. IP Position (Score: X.X) Explanation 
+4. Technical Feasibility (Score: X.X) Explanation
+5. Development Cost (Score: X.X) Explanation
+6. Time to Market (Score: X.X) Explanation
+7. Regulatory Complexity (Score: X.X) Explanation
+8. Synergy (Score: X.X) Explanation
+9. ESG (Score: X.X) Explanation
+
+Total Score: X.X / 45.0
 
 You must evaluate the following categories. Each criterion contains five subcategory that include explanatory guidance. Use these parameters to justify your scoring.
 

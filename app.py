@@ -88,6 +88,11 @@ if submitted and description.strip():
             st.warning(f"Web search failed: {e}")
 
         gpt_prompt = f"""
+You work for Strike BioTech, a biotechnology company focused on developing and commercializing products that involve biologically-driven innovation, including engineered microbes, molecular delivery systems, and natural compound therapeutics.
+
+You are evaluating whether a potential product is strategically aligned with Strike BioTech’s mission, capabilities, and goals. This includes assessing how biologically relevant the product is, whether it falls within or adjacent to core biotech domains, and how well it fits our R&D, regulatory, and commercialization infrastructure.
+
+You are not deciding whether to build the product — you are scoring its strategic and technical fit based on our biotech company’s perspective.
 You are a research analyst for a biotechnology company.
 
 Your task is to evaluate each specified product across the nine stated categories. Each category must be rated with a value from 1.0 (no favorable) to 5.0 (very favorable).
@@ -97,11 +102,11 @@ Scoring should be rigorous and based on evidence, domain knowledge, and light re
 You must internally consider the five sub-criteria within each category to help contribute to the overall evaluation and each of these much be governed by the fact that our company is strategically as biotechnology company.
 
 Important rules:
-- Return exactly **one score per category** from 1.0 (poor) to 5.0 (excellent).
+- Return exactly **one score per category** from 1.0 (poor) to 5.0 (excellent) and anywhere in between.
 - Show subcategory scores for viewing perposes only (1.0-5.0)
 - Each subcategory should vary in score depending on the products fit to the category. 
 - If data is unclear, reflect that with a more cautious score (e.g. 3.0 or lower).
-- Make meaningful distinctions based off justified reasons.
+- Make meaningful distinctions backed by justified reasons.
         "Total Score: X.X / 45.0"
 
         Use this exact output format for every product:

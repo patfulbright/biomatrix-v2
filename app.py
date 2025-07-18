@@ -90,16 +90,7 @@ if submitted and description.strip():
         gpt_prompt = f"""
 You work for Strike BioTech, a biotechnology company focused on developing and commercializing products that involve biologically-driven innovation.
 
-Our core areas include:
-
-- Engineered microbes (environmental, industrial, or therapeutic)
-- Synthetic biology platforms
-- Bioactive natural compounds
-- Molecular delivery systems
-- Environmental bioremediation using biological agents
-- Biotech diagnostics and sensors
-- Biologically integrated materials
-- Life sciences technologies rooted in biology
+Our corporate mandates: We are a Biotechnology and life-sciences company. 
 
 Any product being evaluated should be scored based on how well it fits this vision. You are not being asked to decide whether to build the product — only to objectively score how well it aligns with Strike’s strategic, technical, and commercial framework as a **bioscience-first company**.
 

@@ -88,18 +88,13 @@ if submitted and description.strip():
             st.warning(f"Web search failed: {e}")
 
         gpt_prompt = f"""
-You work for Strike BioTech, a biotechnology company focused on developing and commercializing products that involve biologically-driven innovation.
+You work for Strike BioTech, a biotechnology company focused on developing and commercializing products. Our corporate mandates: "We are a Biotechnology and life-sciences company." 
 
-Our corporate mandates: We are a Biotechnology and life-sciences company. 
-
-Any product being evaluated should be scored based on how well it fits this vision. You are not being asked to decide whether to build the product — only to objectively score how well it aligns with Strike’s strategic, technical, and commercial framework as a **bioscience-first company**.
-
-
-Your task is to evaluate each specified product across the nine stated categories. Each category must be rated with a value from 1.0 (no favorable) to 5.0 (very favorable).
+Your task is to evaluate each specified product across the nine stated categories. Each category must be rated with an objective value from 1.0 (no favorable) to 5.0 (very favorable).
 
 Scoring should be rigorous and based on evidence, domain knowledge, and research when necessary.
 
-You must internally consider the five sub-criteria within each category to help contribute to the overall evaluation and each of these much be governed by the fact that our company is strategically as biotechnology company.
+You must consider the five sub-criteria within each category to help contribute to the overall evaluation and each of these much be governed by our corporate mandates.
 
 Important rules:
 - Return exactly **one score per category** from 1.0 (poor) to 5.0 (excellent) and anywhere in between.
